@@ -6,7 +6,7 @@ resource "azurerm_virtual_machine_extension" "iis" {
   name                 = "install-iis"
   resource_group_name  = "${var.resource_group_name}"
   location             = "${var.location}"
-  virtual_machine_name = "${var.azurerm_virtual_machine.iis.name}"
+  virtual_machine_name = "${var.vmname}"
   publisher            = "Microsoft.Compute"
   type                 = "CustomScriptExtension"
   type_handler_version = "1.9"
