@@ -1,31 +1,19 @@
 ##########################################################
-## Join VM to Active Directory Domain
+## Install IIS on VM
 ##########################################################
 
-resource "azurerm_virtual_machine_extension" "join-domain" {
-  name                 = "join-domain"
-  location             = "${var.location}"
+resource "azurerm_virtual_machine_extension" "iis" {
+  name                 = "install-iis"
   resource_group_name  = "${var.resource_group_name}"
-  virtual_machine_name = "${var.vmname}"
+  location             = "${var.location}"
+  virtual_machine_name = "${var.azurerm_virtual_machine.iis.name}"
   publisher            = "Microsoft.Compute"
-  type                 = "JsonADDomainExtension"
-  type_handler_version = "1.3"
-  
+  type                 = "CustomScriptExtension"
+  type_handler_version = "1.9"
 
-  # NOTE: the `OUPath` field is intentionally blank, to put it in the Computers OU
   settings = <<SETTINGS
-    {
-        "Name": "${var.active_directory_domain}",
-        "OUPath": "",
-        "User": "${var.active_directory_domain}\\${var.active_directory_username}",
-        "Restart": "true",
-        "Options": "3"
-    }
-SETTINGS
-
-  protected_settings = <<SETTINGS
-    {
-        "Password": "${var.active_directory_password}"
-    }
+    { 
+      "commandToExecute": "powershell Add-WindowsFeature Web-Asp-Net45;Add-WindowsFeature NET-Framework-45-Core;Add-WindowsFeature Web-Net-Ext45;Add-WindowsFeature Web-ISAPI-Ext;Add-WindowsFeature Web-ISAPI-Filter;Add-WindowsFeature Web-Mgmt-Console;Add-WindowsFeature Web-Scripting-Tools;Add-WindowsFeature Search-Service;Add-WindowsFeature Web-Filtering;Add-WindowsFeature Web-Basic-Auth;Add-WindowsFeature Web-Windows-Auth;Add-WindowsFeature Web-Default-Doc;Add-WindowsFeature Web-Http-Errors;Add-WindowsFeature Web-Static-Content;"
+    } 
 SETTINGS
 }
